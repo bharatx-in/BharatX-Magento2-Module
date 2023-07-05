@@ -85,14 +85,20 @@ class Config
 
     public function getReturnUrl(string $order_id)
     {
-        $baseUrl = $this->helper->getUrl('testpayment/standard/response', array('_secure' => true));
+        // $baseUrl = $this->helper->getUrl('checkout/onepage/success');
+        // $baseUrl = $this->helper->getUrl('testpayment/standard/response', array('_secure' => true));
+        $baseUrl = $this->helper->getUrl('testpayment/standard/response');
         $returnUrl = $baseUrl . "?cf_id={$order_id}";
         return $returnUrl;
     }
 
     public function getNotifyUrl()
     {
-        return $this->helper->getUrl('testpayment/standard/notify', array('_secure' => true));
+
+        // return "https://webhook.site/23cabeb7-bb1d-424a-86d5-7fa9f9550d75";
+        // return $this->helper->getUrl('testpayment/standard/notify', array('_secure' => true));
+        $baseUrl = 'https://d79a940bf544.ngrok.app';
+        return $baseUrl.'/testpayment/standard/notify';
     }
 
     public function getBharatxApi() {

@@ -44,7 +44,7 @@ class Response extends \Test\Testpayment\Controller\CfAbstract
 
     /**
      * @var \Magento\Customer\Model\Session
-    */
+     */
     protected $customerSession;
 
     /**
@@ -72,7 +72,7 @@ class Response extends \Test\Testpayment\Controller\CfAbstract
     //  */
     // protected $orderFactory;
 
-     /**
+    /**
      * @param \Psr\Log\LoggerInterface $logger
      * @param \Test\Testpayment\Model\Config $config
      * @param \Magento\Framework\App\Action\Context $context
@@ -132,113 +132,83 @@ class Response extends \Test\Testpayment\Controller\CfAbstract
             'parameters'    => []
         ];
 
-        if(empty($request['cf_id']) === false) {
+        if (empty($request['cf_id']) === false) {
 
             $transactionId = $request['cf_id'];
             $magentoId = (explode("_", $transactionId))[0];
             $resultRedirect = $this->resultRedirectFactory->create();
             $order = $this->orderFactory->create()->loadByIncrementId($magentoId);
-            $validateOrder = $this->checkRedirectOrderStatus($transactionId, $order);
 
+            $mageOrderStatus = $order->getStatus();
 
-            $this->logger->info("responseexecute", [
-                "request" => $request,
-                "magentoId" => $magentoId,
-                "order" => $order,
-                "orderstatus" => $order->getStatus(),
-                "validateOrderStatus" => $validateOrder['status']
-            ]);
+            $validateOrder = [
+                'status' => 'ERROR'
+            ];
+
+            $this->logger->info("response mageOrderStatus " . $mageOrderStatus);
+
+            if ($mageOrderStatus == SELF::STATE_PENDING) {
+                $validateOrder = $this->checkRedirectOrderStatus($transactionId, $order);
+            } else if ($mageOrderStatus == SELF::STATE_PROCESSING) {
+                $validateOrder['status'] = "SUCCESS";
+            } else if ($mageOrderStatus == SELF::STATE_CANCELED) {
+                $validateOrder['status'] = "FAILURE";
+            }
 
             if ($validateOrder['status'] == "SUCCESS") {
 
-                $this->logger->info("Success called");
-
-
-                $mageOrderStatus = $order->getStatus();
-                $this->logger->info("orderStatus". $mageOrderStatus);
-                if($mageOrderStatus === 'processing') {
-                    // maybe need to test if $validateOrder['transaction_id'] has the magento_id
-                    // $this->processPayment($magentoId, $order);
-
+                // maybe need to test if $validateOrder['transaction_id'] has the magento_id
+                if ($mageOrderStatus == SELF::STATE_PENDING) {
+                    $this->processPayment($magentoId, $order);
                 }
-                $this->processPayment($magentoId, $order);
-                $this->messageManager->addSuccess(__('Your payment was successful'));
+
+                $this->logger->info("Bharatx Response payment successfull for transactionId " . $transactionId);
+
+                $this->messageManager->addSuccessMessage('Your payment was successful');
                 $resultRedirect->setPath('checkout/onepage/success');
                 return $resultRedirect;
             } else if ($validateOrder['status'] == "CANCELLED") {
 
-                $this->logger->info("Cancelled called");
+                $this->logger->info("Bharatx Response payment cancelled for transactionId " . $transactionId);
 
-                $this->messageManager->addWarning(__('Your payment was cancel'));
-                $this->checkoutSession->restoreQuote();
-                $resultRedirect->setPath('checkout/cart');
-                return $resultRedirect;
-            } else if ($validateOrder['status'] == "FAILED") {
-
-                $this->logger->info("Failed called");
-
-
-                $this->messageManager->addErrorMessage(__('Your payment was failed'));
+                $this->messageManager->addErrorMessage('Your payment was cancel');
                 $order->cancel()->save();
+                $this->checkoutSession->restoreQuote();
                 $resultRedirect->setPath('checkout/onepage/failure');
                 return $resultRedirect;
-            } else if($validateOrder['status'] == "PENDING"){
+            } else if ($validateOrder['status'] == "FAILURE") {
 
-                $this->logger->info("Pending called");
+                $this->logger->info("Bharatx Response payment failed for transactionId " . $transactionId);
 
+                $this->messageManager->addErrorMessage('Your payment was failed');
+                $order->cancel()->save();
+                $this->checkoutSession->restoreQuote();
+                $resultRedirect->setPath('checkout/onepage/failure');
+                return $resultRedirect;
+            } else if ($validateOrder['status'] == "PENDING") {
+
+                $this->logger->info("Bharatx Response payment pending for transactionId " . $transactionId);
 
                 $this->checkoutSession->restoreQuote();
-                $this->messageManager->addWarning(__('Your payment is pending'));
+                $this->messageManager->addWarningMessage('Your payment is pending');
                 $resultRedirect->setPath('checkout/cart');
                 return $resultRedirect;
-            } else{
+            } else {
 
-                $this->logger->info("Nothing called"); 
-
+                $this->logger->info("Bharatx Response payment error for transactionId" . $transactionId, $validateOrder);
 
                 $this->checkoutSession->restoreQuote();
-                $this->messageManager->addErrorMessage(__('There is an error. Payment status is pending'));
+                $this->messageManager->addErrorMessage('There is an error. Payment status is pending');
                 $resultRedirect->setPath('checkout/cart');
                 return $resultRedirect;
             }
         } else {
 
-            $this->logger->info("no cf id");
-
+            $this->logger->info("Bharatx Response payment no CF id");
 
             $order = $this->checkoutSession->getLastRealOrder();
             $code = 400;
-            
-            $transactionId = $request['additional_data']['cf_transaction_id'];
-            
-            if(empty($transactionId) === false && $request['additional_data']['cf_order_status'] === 'PAID')
-            {
-                $orderId = $order->getIncrementId();
-                $validateOrder = $this->validateSignature($request, $order);
-                if(!empty($validateOrder['status']) && $validateOrder['status'] === true) {
-                    $mageOrderStatus = $order->getStatus();
-                    if($mageOrderStatus === 'pending') {
-                        $this->processPayment($transactionId, $order);
-                    }
-
-                    $responseContent = [
-                        'success'       => true,
-                        'redirect_url'  => 'checkout/onepage/success/',
-                        'order_id'      => $orderId,
-                    ];
-
-                    $code = 200;
-                } else {
-                    $responseContent['message'] = $validateOrder['errorMsg'];
-                }
-
-                $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-                $response->setData($responseContent);
-                $response->setHttpResponseCode($code);
-                return $response;
-            } else {
-                $responseContent['message'] = "Cashfree Payment details missing.";
-            }
+            $responseContent['message'] = "BharatX Payment details missing.";
         }
 
         //update/disable the quote
@@ -246,7 +216,7 @@ class Response extends \Test\Testpayment\Controller\CfAbstract
         $quote = $objectManager->get('Magento\Quote\Model\Quote')->load($order->getQuoteId());
         $quote->setIsActive(true)->save();
         $this->checkoutSession->setFirstTimeChk('0');
-        
+
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
         $response->setData($responseContent);
         $response->setHttpResponseCode($code);

@@ -121,6 +121,7 @@ class Request extends \Test\Testpayment\Controller\CfAbstract
      */
     public function execute()
     {
+
         $order = $this->checkoutSession->getLastRealOrder();
         $orderId = $order->getIncrementId();
         $new_order_status = $this->config->getNewOrderStatus();
@@ -201,12 +202,17 @@ class Request extends \Test\Testpayment\Controller\CfAbstract
                 'successRedirectUrl' => $return_url,
                 'failureRedirectUrl' => $return_url,
                 'cancelRedirectUrl' => $return_url,
-                'webhookUrl' => $notify_url
+                'webhookUrl' => $notify_url,
+                // "testModeConfigurations" => array(
+                //     "shouldFail" => true
+                // )
             ),
             'user' => $user
         );
 
-        $url = 'https://web-v2.bharatx.tech/api/merchant/transaction'; // Replace with your API URL
+        $this->logger->info("request params", $params);
+
+        $url = 'https://web-v2.bharatx.tech/api/merchant/transaction'; 
 
         $username = $this->config->getConfigData('partner_id');
         $password = $this->config->getConfigData('api_key');

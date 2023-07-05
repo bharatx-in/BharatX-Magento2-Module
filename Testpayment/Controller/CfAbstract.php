@@ -10,9 +10,10 @@ use Magento\Sales\Model\Order\Payment\State\CaptureCommand;
 abstract class CfAbstract extends \Magento\Framework\App\Action\Action
 {
     const STATE_PROCESSING      = 'processing';
-    const STATE_PENDING_PAYMENT = 'pending_payment';
+    // const STATE_PENDING_PAYMENT = 'pending_payment';
     const STATE_CANCELED        = 'canceled';
     const STATE_CLOSED          = 'closed';
+    const STATE_PENDING         = 'pending';
 
     /**
      * @var \Psr\Log\LoggerInterface 
@@ -204,45 +205,99 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
         return $validation_content;
     }
 
-    protected function validateWebhook($request, $order)
-    {
-        $orderId        = $request["orderId"];
-        $cfOrderAmount  = $request["orderAmount"];   
-        $paymentMode    = $request["paymentMode"];  
-        $referenceId    = $request["referenceId"];   
-        $txStatus       = $request["txStatus"]; 
-        $txTime         = $request["txTime"]; 
-        $txMsg          = $request["txMsg"];
-        $signature      = $request["signature"];
+    // protected function validateWebhook($request, $order)
+    // {
+    //     $orderId        = $request["orderId"];
+    //     $cfOrderAmount  = $request["orderAmount"];   
+    //     $paymentMode    = $request["paymentMode"];  
+    //     $referenceId    = $request["referenceId"];   
+    //     $txStatus       = $request["txStatus"]; 
+    //     $txTime         = $request["txTime"]; 
+    //     $txMsg          = $request["txMsg"];
+    //     $signature      = $request["signature"];
 
-        $orderAmount    = round($order->getGrandTotal(), 2);
-        if ($orderAmount != $cfOrderAmount)
-        {
-            $error_message = "Cart order amount = {$orderAmount} doesn't match with amount paid = {$cfOrderAmount}";
-            $validation_content['errorMsg'] = $error_message;
-            $validation_content['status'] = false;
-            $this->logger->info(__("Test Error: ".$error_message));
-            return $validation_content;
-        }
+    //     $orderAmount    = round($order->getGrandTotal(), 2);
+    //     if ($orderAmount != $cfOrderAmount)
+    //     {
+    //         $error_message = "Cart order amount = {$orderAmount} doesn't match with amount paid = {$cfOrderAmount}";
+    //         $validation_content['errorMsg'] = $error_message;
+    //         $validation_content['status'] = false;
+    //         $this->logger->info(__("Test Error: ".$error_message));
+    //         return $validation_content;
+    //     }
                     
-        $secretKey = $this->config->getConfigData('secret_key');
+    //     $secretKey = $this->config->getConfigData('secret_key');
 
-        $data = $orderId.$cfOrderAmount.$referenceId.$txStatus.$paymentMode.$txMsg.$txTime;
+    //     $data = $orderId.$cfOrderAmount.$referenceId.$txStatus.$paymentMode.$txMsg.$txTime;
     
-        $hash_hmac = hash_hmac('sha256', $data, $secretKey, true) ;
-        $computedSignature = base64_encode($hash_hmac); 
+    //     $hash_hmac = hash_hmac('sha256', $data, $secretKey, true) ;
+    //     $computedSignature = base64_encode($hash_hmac); 
         
-        if ($computedSignature != $signature) {
-            $error_message = "Signature mismatch.";
-            $validation_content['errorMsg'] = $error_message;
-            $validation_content['status'] = false;
-            $this->logger->info(__("Test Error: ".$error_message));
-            return $validation_content;
+    //     if ($computedSignature != $signature) {
+    //         $error_message = "Signature mismatch.";
+    //         $validation_content['errorMsg'] = $error_message;
+    //         $validation_content['status'] = false;
+    //         $this->logger->info(__("Test Error: ".$error_message));
+    //         return $validation_content;
+    //     }
+
+    //     $validation_content['errorMsg'] = "";
+    //     $validation_content['status'] = true;
+    //     return $validation_content;
+    // }
+
+    protected function processOrderData($bxOrder)
+    {
+        $validation_content = [
+            'status' => 'ERROR', // status can be [PENDING, SUCCESS, FAILURE, CANCELLED]
+        ];
+
+        $this->logger->info("processorderdata", [
+            "bxorder"=> $bxOrder,
+            "transaction" => isset($bxOrder->transaction)
+        ]);
+
+        $this->logger->info("processorderdata", [
+            "transaction" => $bxOrder->transaction,
+        ]);
+
+        $this->logger->info("processorderdata", [
+            "status" => $bxOrder->transaction->status
+        ]);
+
+        if($bxOrder !== null && isset($bxOrder->transaction) && isset($bxOrder->transaction->status)){
+            $orderStatus = $bxOrder->transaction->status;
+            $orderAmount = $bxOrder->transaction->amount;
+            $orderTransactionId = $bxOrder->transaction->id;
+            $orderTransactionUrl = $bxOrder->transaction->url;
+
+            $validation_content['status'] = $orderStatus;
+            $validation_content['transaction_id'] = $orderTransactionId;
+            $validation_content['transaction_url'] = $orderTransactionUrl;
         }
 
-        $validation_content['errorMsg'] = "";
-        $validation_content['status'] = true;
+        $this->logger->info("validation_content", $validation_content);
+
         return $validation_content;
+    }
+
+    protected function validateWebhook($request){
+
+        //TODO: verify the signature coming from the webhook
+
+        $this->logger->info("validatewebhhok request", [
+            "request" => $request
+        ]);
+
+        $content = $request->getContent();
+
+        $content = json_decode($content);
+
+        $this->logger->info("webhook requests", [
+            "content" => $content
+        ]);
+
+        return $this->processOrderData($content);
     }
 
     protected function checkRedirectOrderStatus($cfOrderId, $order)
@@ -281,22 +336,7 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
 
         $bxOrder = json_decode($response);
 
-        $validation_content = [
-            'status' => 'ERROR'
-        ];
-
-        if($bxOrder !== null && isset($bxOrder->transaction) && isset($bxOrder->transaction->status)){
-            $orderStatus = $bxOrder->transaction->status;
-            $orderAmount = $bxOrder->transaction->amount;
-            $orderTransactionId = $bxOrder->transaction->id;
-            $orderTransactionUrl = $bxOrder->transaction->url;
-
-            $validation_content['status'] = $orderStatus;
-            $validation_content['transaction_id'] = $orderTransactionId;
-            $validation_content['transaction_url'] = $orderTransactionUrl;
-        }
-
-        return $validation_content;
+        return $this->processOrderData($bxOrder);
 
         // if (null !== $cfOrder && !empty($cfOrder[0]->payment_status))
         // {
