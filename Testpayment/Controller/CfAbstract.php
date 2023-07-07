@@ -423,6 +423,9 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
             )
             ->setIsCustomerNotified(true)
             ->save();
+
+
+            $this->logger->info("invoice generated for transacation id " . $transactionId);
         }
 
         try

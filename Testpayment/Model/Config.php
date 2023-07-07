@@ -132,7 +132,7 @@ class Config
     public function canSendInvoice()
     {
         // return (bool) (int) $this->getConfigData(self::KEY_ENABLE_INVOICE, $this->storeId);
-        return false;
+        return true;
     }
 
     public function isActive()

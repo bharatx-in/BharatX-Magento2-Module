@@ -3,11 +3,14 @@
 namespace Test\Testpayment\Model;
 
 use Magento\Payment\Model\InfoInterface;
+use Magento\Framework\Exception\LocalizedException;
+
 
 /**
  * Pay In Store payment method model
  */
-class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod {
+class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
+{
 
     const METHOD_CODE = 'testpayment';
     const ACTION_PROCESSING = 'processing';
@@ -29,6 +32,26 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod {
      * @var bool
      */
     protected $_canUseCheckout = true;
+
+    /**
+     * @var bool
+     */
+    protected $_canRefund = true;
+
+    /**
+     * @var bool
+     */
+    protected $_canUseInternal          = true;        //Disable module for Magento Admin Order
+
+    /**
+     * @var bool
+     */
+    protected $_canRefundInvoicePartial = true;
+
+    /**
+     * @var \Magento\Sales\Api\OrderRepositoryInterface
+     */
+    protected $orderRepository;
 
     /**
      * 
@@ -57,6 +80,7 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod {
         \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
         array $data = []
     ) {
         $this->config   = $config;
@@ -73,10 +97,118 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod {
             $resourceCollection,
             $data
         );
+
+        $this->orderRepository = $orderRepository;
     }
 
     public function capture(InfoInterface $payment, $amount)
     {
+        return $this;
+    }
+
+    /**
+     * Determine if the payment method allows refund
+     *
+     * @return bool
+     */
+    public function canRefund()
+    {
+        return true;
+    }
+
+    /**
+     * Process refund for the payment.
+     *
+     * @param InfoInterface $payment
+     * @param float $amount
+     * @return $this
+     * @throws LocalizedException
+     */
+    public function refund(InfoInterface $payment, $amount)
+    {
+        if (!$this->canRefund()) {
+            throw new LocalizedException(__('Refunds are not supported by this payment method.'));
+        }
+
+        // Implement your refund logic here
+        $order = $payment->getOrder();
+        $orderId = $order->getIncrementId();
+
+        $url = 'https://web-v2.bharatx.tech/api/merchant/transaction';
+
+        $username = $this->config->getConfigData('partner_id');
+        $password = $this->config->getConfigData('api_key');
+
+        $transactionId = $orderId . '_' . $username;
+
+        $params = array(
+            'refund' => array(
+                'merchantRefundId' => $transactionId . '_' . 'refund',
+                'amount' => $amount,
+            ),
+            'createConfiguration' => array(
+                'webhookUrl' => 'https://webhook.site/23cabeb7-bb1d-424a-86d5-7fa9f9550d75',
+            ),
+        );
+
+        $payload = json_encode($params);
+
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json',
+            ),
+            CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+            CURLOPT_USERPWD => $username . ':' . $password,
+        ));
+
+        $curlResponse = curl_exec($curl);
+
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+
+        // [PENDING, SUCCESS, FAILURE, CANCELLED, TBD]
+
+        if ($err) {
+            throw new LocalizedException(__('API request failed. ' . $err));
+        } else {
+            $responseData = json_decode($curlResponse);
+
+            if ($responseData != null && isset($responseData->status)) {
+                $redirectUrl = $responseData->transaction->url;
+
+                $responseStatus = 'refund_' . $responseData->status;
+
+                // if ($responseData->status === 'PENDING') {
+
+                $order->setState('refund_pending')
+                    ->setStatus('refund_pending')
+                    ->save();
+                // $payment->setAmountPaid($amount)
+                // ->setLastTransId($refund->id)
+                // ->setTransactionId($refund->id)
+                // ->setIsTransactionClosed(true)
+                // ->setShouldCloseParentTransaction(true);
+
+                // }
+                $this->logger->info('$responseData', [
+                    'responseData' => $responseData
+                ]);
+            } else {
+                $this->logger->error("Transaction or URL property not found in the response.");
+            }
+        }
+
+
+
         return $this;
     }
 }

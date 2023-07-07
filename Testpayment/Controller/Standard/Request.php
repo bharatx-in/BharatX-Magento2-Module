@@ -184,7 +184,11 @@ class Request extends \Test\Testpayment\Controller\CfAbstract
             'email' => $email
         );
 
-        $transactionId = $orderId . '_' . uniqid();
+        $username = $this->config->getConfigData('partner_id');
+        $password = $this->config->getConfigData('api_key');
+
+        // $transactionId = $orderId . '_' . uniqid();
+        $transactionId = $orderId . '_' . $username;
 
         $return_url = $this->config->getReturnUrl($transactionId);
         $notify_url = $this->config->getNotifyUrl();
@@ -213,9 +217,6 @@ class Request extends \Test\Testpayment\Controller\CfAbstract
         $this->logger->info("request params", $params);
 
         $url = 'https://web-v2.bharatx.tech/api/merchant/transaction'; 
-
-        $username = $this->config->getConfigData('partner_id');
-        $password = $this->config->getConfigData('api_key');
 
         $payload = json_encode($params);
 
