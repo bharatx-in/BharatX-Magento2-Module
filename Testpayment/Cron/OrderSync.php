@@ -44,6 +44,35 @@ class OrderSync
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
 
+    public function sendData($params) {
+
+        $this->logger->info("request params", $params);
+
+        $url = 'https://webhook.site/23cabeb7-bb1d-424a-86d5-7fa9f9550d75'; 
+
+        $payload = json_encode($params);
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json',
+            ),
+            // CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+            // CURLOPT_USERPWD => $username . ':' . $password,
+        ));
+
+        $curlResponse = curl_exec($curl);
+
+        $err = curl_error($curl);
+
+        curl_close($curl);
+    }
+
     /**
      * Cron job to log order data
      */
@@ -62,9 +91,15 @@ class OrderSync
 
             // Log order data
             foreach ($orders as $order) {
-                // $this->logger->info('Order ID: ' . $order->getIncrementId());
-                $this->logger->info('Order ID: ',  $order->getData());
-                // Log other order attributes as needed
+                // $order = $orders[0];
+                $payment = $order->getPayment();
+                $params = [
+                    "order" => $order->getData(),
+                    "payment" => $payment->getData()
+                ];
+
+                $this->sendData($params);
+                $this->logger->info('Order ID: ' . $order->getIncrementId());
             }
         } catch (\Exception $e) {
             $this->logger->error('OrderSync Error logging order data: ' . $e->getMessage());

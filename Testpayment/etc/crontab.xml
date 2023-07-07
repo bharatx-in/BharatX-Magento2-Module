@@ -4,5 +4,8 @@
         <job name="testpayment_order_logger" instance="Test\Testpayment\Cron\OrderSync" method="execute">
             <schedule>* * * * *</schedule> <!-- Set your desired cron schedule here -->
         </job>
+        <job name="testpayment_update_order_to_processing" instance="Test\Testpayment\Cron\UpdateOrdersToProcessing" method="execute">
+            <schedule>* * * * *</schedule> <!-- Set your desired cron schedule here -->
+        </job>
     </group>
 </config>

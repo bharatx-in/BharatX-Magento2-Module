@@ -300,14 +300,14 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
         return $this->processOrderData($content);
     }
 
-    protected function checkRedirectOrderStatus($cfOrderId, $order)
+    public function checkRedirectOrderStatus($cfOrderId, $order)
     {
         // $getPaymentUrl = $this->getOrderUrl()."/".$cfOrderId."/payments";
         $getPaymentUrl = $this->getOrderUrl()."/merchant/transaction/".$cfOrderId;
 
         // $orderAmount    = round($order->getGrandTotal(), 2);
 
-        $orderAmount = (int) (number_format($order->getGrandTotal() * 100, 0, ".", ""));
+        // $orderAmount = (int) (number_format($order->getGrandTotal() * 100, 0, ".", ""));
 
         $username = $this->config->getConfigData('partner_id');
         $password = $this->config->getConfigData('api_key');
@@ -371,7 +371,7 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
         // }
     }
 
-    protected function processPayment($transactionId, $order) {
+    public function processPayment($transactionId, $order) {
         $orderAmount = round($order->getGrandTotal(), 2);
         $order->setState(self::STATE_PROCESSING)->setStatus(self::STATE_PROCESSING);
         $payment = $order->getPayment();
