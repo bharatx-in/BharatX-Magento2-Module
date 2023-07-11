@@ -1,19 +1,94 @@
+<head>
+    <style>
+        .payment_method_bharatx-pay-in-3-feature-plugin {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            margin-left: 20px;
+            position: relative;
+            -webkit-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.06);
+            -moz-box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.06);
+            box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.06);
+            background: #f5f5f5;
+            padding: 20px;
+            width: fit-content;
+        }
+
+        .bharatx-explanation-item {
+            display: flex;
+            align-content: center;
+        }
+
+        .bharatx-explanation-item svg {
+            margin-right: 10px;
+        }
+
+        img.bharatx-merchant-checkout-gateway-logo {
+            height: 20px !important;
+        }
+    </style>
+</head>
+
 <div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
     <div class="payment-method-title field choice">
         <input type="radio" name="payment[method]" class="radio"
             data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()" />
-        <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
+
+        <label data-bind="attr: {'for': getCode()}" class="label">
+            <span data-bind="text: getTitle()"></span>
+            <img class="bharatx-merchant-checkout-gateway-logo" data-bind="attr: { src: getTitleImage(), alt: 'BharatX' }" ></img>
+        </label>
+
+        <div class="payment_box payment_method_bharatx-pay-in-3-feature-plugin">
+            <div>
+                <div class="bharatx-explanation-item">
+                    <div style="margin-right: 8px; padding-top: 2px;"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                            height="16" viewBox="0 0 28 28" fill="none">
+                            <path
+                                d="M20.0734 10.2587C19.6184 9.8031 18.8787 9.8031 18.4237 10.2587L13.4152 15.2666L11.3234 13.1753C10.8684 12.7198 10.1287 12.7198 9.67372 13.1753C9.21814 13.6309 9.21814 14.3694 9.67372 14.825L12.5904 17.7417C12.8179 17.9698 13.1166 18.0835 13.4152 18.0835C13.7139 18.0835 14.0126 17.9698 14.2401 17.7417L20.0734 11.9083C20.529 11.4528 20.529 10.7143 20.0734 10.2587Z"
+                                fill="#515151"></path>
+                            <path
+                                d="M26.8333 12.8333C26.1893 12.8333 25.6667 13.356 25.6667 14C25.6667 20.433 20.433 25.6667 14 25.6667C7.567 25.6667 2.33333 20.433 2.33333 14C2.33333 7.567 7.567 2.33333 14 2.33333C17.1319 2.33333 20.0719 3.55717 22.2792 5.77967C22.7325 6.23758 23.4716 6.23992 23.9289 5.7855C24.3862 5.33167 24.3886 4.59317 23.9347 4.13583C21.2864 1.46883 17.7578 0 14 0C6.28017 0 0 6.28017 0 14C0 21.7198 6.28017 28 14 28C21.7198 28 28 21.7198 28 14C28 13.356 27.4773 12.8333 26.8333 12.8333Z"
+                                fill="#515151"></path>
+                        </svg></div>
+                    <div> Split payments into <strong>3 easy interest-free</strong> parts</div>
+                </div>
+                <div class="bharatx-explanation-item">
+                    <div style="margin-right: 8px; padding-top: 2px;"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                            height="16" viewBox="0 0 28 28" fill="none">
+                            <path
+                                d="M20.0734 10.2587C19.6184 9.8031 18.8787 9.8031 18.4237 10.2587L13.4152 15.2666L11.3234 13.1753C10.8684 12.7198 10.1287 12.7198 9.67372 13.1753C9.21814 13.6309 9.21814 14.3694 9.67372 14.825L12.5904 17.7417C12.8179 17.9698 13.1166 18.0835 13.4152 18.0835C13.7139 18.0835 14.0126 17.9698 14.2401 17.7417L20.0734 11.9083C20.529 11.4528 20.529 10.7143 20.0734 10.2587Z"
+                                fill="#515151"></path>
+                            <path
+                                d="M26.8333 12.8333C26.1893 12.8333 25.6667 13.356 25.6667 14C25.6667 20.433 20.433 25.6667 14 25.6667C7.567 25.6667 2.33333 20.433 2.33333 14C2.33333 7.567 7.567 2.33333 14 2.33333C17.1319 2.33333 20.0719 3.55717 22.2792 5.77967C22.7325 6.23758 23.4716 6.23992 23.9289 5.7855C24.3862 5.33167 24.3886 4.59317 23.9347 4.13583C21.2864 1.46883 17.7578 0 14 0C6.28017 0 0 6.28017 0 14C0 21.7198 6.28017 28 14 28C21.7198 28 28 21.7198 28 14C28 13.356 27.4773 12.8333 26.8333 12.8333Z"
+                                fill="#515151"></path>
+                        </svg></div>
+                    <div> Get credit approved with <strong>zero documentation</strong></div>
+                </div>
+                <div class="bharatx-explanation-item">
+                    <div style="margin-right: 8px; padding-top: 2px;"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                            height="16" viewBox="0 0 28 28" fill="none">
+                            <path
+                                d="M20.0734 10.2587C19.6184 9.8031 18.8787 9.8031 18.4237 10.2587L13.4152 15.2666L11.3234 13.1753C10.8684 12.7198 10.1287 12.7198 9.67372 13.1753C9.21814 13.6309 9.21814 14.3694 9.67372 14.825L12.5904 17.7417C12.8179 17.9698 13.1166 18.0835 13.4152 18.0835C13.7139 18.0835 14.0126 17.9698 14.2401 17.7417L20.0734 11.9083C20.529 11.4528 20.529 10.7143 20.0734 10.2587Z"
+                                fill="#515151"></path>
+                            <path
+                                d="M26.8333 12.8333C26.1893 12.8333 25.6667 13.356 25.6667 14C25.6667 20.433 20.433 25.6667 14 25.6667C7.567 25.6667 2.33333 20.433 2.33333 14C2.33333 7.567 7.567 2.33333 14 2.33333C17.1319 2.33333 20.0719 3.55717 22.2792 5.77967C22.7325 6.23758 23.4716 6.23992 23.9289 5.7855C24.3862 5.33167 24.3886 4.59317 23.9347 4.13583C21.2864 1.46883 17.7578 0 14 0C6.28017 0 0 6.28017 0 14C0 21.7198 6.28017 28 14 28C21.7198 28 28 21.7198 28 14C28 13.356 27.4773 12.8333 26.8333 12.8333Z"
+                                fill="#515151"></path>
+                        </svg></div>
+                    <div> Get <strong>timely reminders</strong> before the next payment date</div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="payment-method-content">
         <div class="payment-method-billing-address">
-            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
-            <!--/ko-->
+        <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
         </div>
         <div class="checkout-agreements-block">
-            <!-- ko foreach: $parent.getRegion('before-place-order') -->
-            <!-- ko template: getTemplate() --><!-- /ko -->
-            <!--/ko-->
+        <!-- ko foreach: $parent.getRegion('before-place-order') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
         </div>
         <div class="actions-toolbar">
             <div class="primary">

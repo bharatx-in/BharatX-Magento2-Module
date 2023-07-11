@@ -12,7 +12,7 @@ use Test\Testpayment\Model\Config;
 use Test\Testpayment\Controller\CfAbstract;
 use Magento\Sales\Model\OrderFactory;
 
-class UpdateOrdersToProcessing 
+class UpdateOrdersToProcessing
 {
     /**
      * @var LoggerInterface
@@ -117,30 +117,35 @@ class UpdateOrdersToProcessing
         $this->logger->info("UpdateOrdersToProcessing Pending Orders ", $pendingOrders);
 
         foreach ($pendingOrders as $pendingOrder) {
+            try {
+                $magentoId = $pendingOrder["increment_id"];
 
-            $magentoId = $pendingOrder["increment_id"];
+                $transactionId = $magentoId;
+                $order = $this->orderFactory->create()->loadByIncrementId($magentoId);
 
-            $transactionId = $magentoId . "_" . $this->config->getPartnerId();
-            $order = $this->orderFactory->create()->loadByIncrementId($magentoId);
+                $validateOrder = $this->baseController->checkRedirectOrderStatus($transactionId, $order);
 
-            $validateOrder = $this->baseController->checkRedirectOrderStatus($transactionId, $order);
+                if ($validateOrder !== 'PENDING') {
+                    // $order = $this->orderRepository->get($magentoId);
+                    // $order = $this->orderFactory->create()->loadByIncrementId($magentoId);
+                }
 
-            if ($validateOrder !== 'PENDING') {
-                // $order = $this->orderRepository->get($magentoId);
-                // $order = $this->orderFactory->create()->loadByIncrementId($magentoId);
-            }
-
-            if ($validateOrder['status'] == "SUCCESS") {
-                $this->baseController->processPayment($magentoId, $order);
-                $this->logger->info("Bharatx UpdateOrdersToProcessing payment successfull for transactionId " . $transactionId);
-            } else if ($validateOrder['status'] == "CANCELLED") {
-                $this->logger->info("Bharatx UpdateOrdersToProcessing payment cancelled for transactionId " . $transactionId);
-                $order->cancel()->save();
-            } else if ($validateOrder['status'] == "FAILURE") {
-                $this->logger->info("Bharatx UpdateOrdersToProcessing payment failed for transactionId " . $transactionId);
-                $order->cancel()->save();
-            } else {
-                $this->logger->info("Bharatx UpdateOrdersToProcessing payment " . $validateOrder['status'] . " for transactionId " . $transactionId);
+                if ($validateOrder['status'] == "SUCCESS") {
+                    $this->baseController->processPayment($magentoId, $order);
+                    $this->logger->info("Bharatx UpdateOrdersToProcessing payment successfull for transactionId " . $transactionId);
+                } else if ($validateOrder['status'] == "CANCELLED") {
+                    $this->logger->info("Bharatx UpdateOrdersToProcessing payment cancelled for transactionId " . $transactionId);
+                    $order->cancel()->save();
+                } else if ($validateOrder['status'] == "FAILURE") {
+                    $this->logger->info("Bharatx UpdateOrdersToProcessing payment failed for transactionId " . $transactionId);
+                    $order->cancel()->save();
+                } else {
+                    $this->logger->info("Bharatx UpdateOrdersToProcessing payment " . $validateOrder['status'] . " for transactionId " . $transactionId);
+                }
+            } catch (\Magento\Framework\Exception\LocalizedException $e) {
+                $this->logger->error('UpdateOrdersToProcessing Error logging Local exception: ' . $e->getMessage());
+            } catch (\Exception $e) {
+                $this->logger->error('UpdateOrdersToProcessing Error logging order data: ' . $e->getMessage());
             }
         }
 

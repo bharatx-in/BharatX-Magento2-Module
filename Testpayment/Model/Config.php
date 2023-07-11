@@ -4,18 +4,16 @@ namespace Test\Testpayment\Model;
 
 use \Magento\Framework\App\Config\ScopeConfigInterface;
 use \Magento\Framework\App\Config\Storage\WriterInterface;
+use \Magento\Sales\Model\Order;
 
 class Config
 {
-    // const KEY_ALLOW_SPECIFIC    = 'allowspecific';
-    // const KEY_SPECIFIC_COUNTRY  = 'specificcountry';
     const KEY_ACTIVE            = 'active';
-    // const KEY_PUBLIC_KEY        = 'app_id';
     const KEY_TITLE             = 'title';
-    // const PAYMENT_ENVIRONMENT   = 'environment';
+    const KEY_TITLE_IMAGE       = 'title_image';
     const KEY_NEW_ORDER_STATUS  = 'order_status';
-    // const KEY_ENABLE_INVOICE    = 'enable_invoice';
-    // const KEY_IN_CONTEXT        = 'in_context';
+    const KEY_LIVE              = 'live';
+    const KEY_ENABLE_INVOICE    = 'enable_invoice';
 
     const KEY_PARTNER_ID = 'partner_id';
     const KEY_API_KEY = 'api_key';
@@ -58,14 +56,14 @@ class Config
         $this->helper = $helper;
     }
 
-    // public function getAppId()
-    // {
-    //     return $this->getConfigData(self::KEY_PUBLIC_KEY);
-    // }
-
     public function getTitle()
     {
         return $this->getConfigData(self::KEY_TITLE);
+    }
+
+    public function getTitleImage()
+    {
+        return $this->getConfigData(self::KEY_TITLE_IMAGE);
     }
 
     public function getPartnerId()
@@ -85,8 +83,6 @@ class Config
 
     public function getReturnUrl(string $order_id)
     {
-        // $baseUrl = $this->helper->getUrl('checkout/onepage/success');
-        // $baseUrl = $this->helper->getUrl('testpayment/standard/response', array('_secure' => true));
         $baseUrl = $this->helper->getUrl('testpayment/standard/response');
         $returnUrl = $baseUrl . "?cf_id={$order_id}";
         return $returnUrl;
@@ -94,15 +90,15 @@ class Config
 
     public function getNotifyUrl()
     {
-
-        // return "https://webhook.site/23cabeb7-bb1d-424a-86d5-7fa9f9550d75";
         // return $this->helper->getUrl('testpayment/standard/notify', array('_secure' => true));
         $baseUrl = 'https://d79a940bf544.ngrok.app';
-        return $baseUrl.'/testpayment/standard/notify';
+        return $baseUrl . '/testpayment/standard/notify';
     }
 
-    public function getBharatxApi() {
+    public function getBharatxApi()
+    {
         return 'https://web-v2.bharatx.tech/api';
+        // return 'https://90dc5967a878.ngrok.app/api';
     }
 
     public function getConfigData($field, $storeId = null)
@@ -131,27 +127,27 @@ class Config
      */
     public function canSendInvoice()
     {
-        // return (bool) (int) $this->getConfigData(self::KEY_ENABLE_INVOICE, $this->storeId);
-        return true;
+        return (bool) (int) $this->getConfigData(self::KEY_ENABLE_INVOICE, $this->storeId);
     }
 
+    /**
+     * @return bool
+     */
     public function isActive()
     {
         return (bool) (int) $this->getConfigData(self::KEY_ACTIVE, $this->storeId);
     }
 
-    // public function canUseForCountry($country)
-    // {
-    //     /*
-    //     for specific country, the flag will set up as 1
-    //     */
-    //     if ($this->getConfigData(self::KEY_ALLOW_SPECIFIC) == 1) {
-    //         $availableCountries = explode(',', $this->getConfigData(self::KEY_SPECIFIC_COUNTRY));
-    //         if (!in_array($country, $availableCountries)) {
-    //             return false;
-    //         }
-    //     }
-
-    //     return true;
-    // }
+    /**
+     * @return string
+     */
+    public function getTransactionMode()
+    {
+        $liveMode = (bool) (int) $this->getConfigData(SELF::KEY_LIVE, $this->storeId);
+        if ($liveMode) {
+            return "LIVE";
+        } else {
+            return "TEST";
+        }
+    }
 }

@@ -188,16 +188,19 @@ class Request extends \Test\Testpayment\Controller\CfAbstract
         $password = $this->config->getConfigData('api_key');
 
         // $transactionId = $orderId . '_' . uniqid();
-        $transactionId = $orderId . '_' . $username;
+        // $transactionId = $orderId . '_' . $username;
+        $transactionId = $orderId;
 
         $return_url = $this->config->getReturnUrl($transactionId);
         $notify_url = $this->config->getNotifyUrl();
+
+        $transaction_mode = $this->config->getTransactionMode();
 
         $params = array(
             'transaction' => array(
                 'id' => $transactionId,
                 'amount' => $amount,
-                'mode' => 'TEST',
+                'mode' => $transaction_mode,
                 'notes' => (object)array(
                     'magento_order_id' => $orderId
                 )
@@ -216,7 +219,7 @@ class Request extends \Test\Testpayment\Controller\CfAbstract
 
         $this->logger->info("request params", $params);
 
-        $url = 'https://web-v2.bharatx.tech/api/merchant/transaction'; 
+        $url = $this->config->getBharatxApi() . '/merchant/transaction';
 
         $payload = json_encode($params);
 
@@ -257,7 +260,8 @@ class Request extends \Test\Testpayment\Controller\CfAbstract
                 ]);
                 $responseContent = [
                     'success' => true,
-                    'redirectUrl' => $redirectUrl                ];
+                    'redirectUrl' => $redirectUrl
+                ];
             } else {
                 $this->logger->info("Transaction or URL property not found in the response.");
                 $code = 500;

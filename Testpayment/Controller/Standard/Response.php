@@ -135,7 +135,7 @@ class Response extends \Test\Testpayment\Controller\CfAbstract
         if (empty($request['cf_id']) === false) {
 
             $transactionId = $request['cf_id'];
-            $magentoId = (explode("_", $transactionId))[0];
+            $magentoId = $transactionId;
             $resultRedirect = $this->resultRedirectFactory->create();
             $order = $this->orderFactory->create()->loadByIncrementId($magentoId);
 

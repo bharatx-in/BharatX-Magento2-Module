@@ -38,10 +38,8 @@ class ConfigProvider implements ConfigProviderInterface
         $config = [
             'payment' => [
                 'testpayment' => [
-                    // 'in_context'    => $this->config->getInContext(),
                     'title' => $this->config->getTitle(),
-                    'partner_id' => $this->config->getPartnerId(),
-                    'api_key' => $this->config->getApiKey(),
+                    'titleImage' => $this->config->getTitleImage()
                 ],
             ],
         ];

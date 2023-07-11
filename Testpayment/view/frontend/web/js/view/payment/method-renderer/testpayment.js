@@ -42,6 +42,10 @@ define(
                 return window.checkoutConfig.payment.testpayment.title;
             },
 
+            getTitleImage: function () {
+                return window.checkoutConfig.payment.testpayment.titleImage;
+            },
+
             isActive: function () {
                 return true;
             },

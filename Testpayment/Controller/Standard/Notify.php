@@ -145,7 +145,7 @@ class Notify extends \Test\Testpayment\Controller\CfAbstract implements CsrfAwar
 
         if (isset($validateOrder['transaction_id'])) {
             $transactionId = $validateOrder['transaction_id'];
-            $magentoId = (explode("_", $transactionId))[0];
+            $magentoId = $transactionId;
             $order = $this->objectManagement->create('Magento\Sales\Model\Order')->loadByIncrementId($magentoId);
 
             $mageOrderStatus = $order->getStatus();

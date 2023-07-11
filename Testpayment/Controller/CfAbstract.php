@@ -332,6 +332,12 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
 
         $response = curl_exec($curl);
         $err = curl_error($curl);
+
+        if ($err) {
+            $this->logger->info("Error: " . $err);
+            throw new \Magento\Framework\Exception\LocalizedException(__('checkRedirectOrderStatus curl failed'));
+        }
+
         curl_close($curl);
 
         $bxOrder = json_decode($response);
