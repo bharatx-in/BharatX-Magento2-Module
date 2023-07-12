@@ -249,8 +249,14 @@ class Request extends \Test\Testpayment\Controller\CfAbstract
                 'success' => false,
                 'message' => 'Unable to create your order. Please contact support.',
             ];
+
+            $this->logger->error("Bharatx merchant transaction creation API failed " . $err);
         } else {
             $bxOrder = json_decode($curlResponse);
+
+            $this->logger->info("request order creation api response", [
+                "bxOrder" => $bxOrder
+            ]);
 
             if (isset($bxOrder->transaction) && isset($bxOrder->transaction->url)) {
                 $code = 200;

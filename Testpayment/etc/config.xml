@@ -2,18 +2,19 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <payment>
-            <testpayment>
+            <bharatx>
                 <payment_action>authorize</payment_action><!-- You can use another methor like capture  -->
                 <model>Test\Testpayment\Model\PaymentMethod</model>
                 <active>1</active>
-                <title>Test Payment</title>
+                <title>BharatX</title>
+                <frontendTitle>Pay in 3 with</frontendTitle>
                 <title_image>https://developer.bharatx.tech/img/logo_black.svg</title_image>
                 <order_status>pending</order_status><!-- set default order status-->
                 <partner_id>testPartnerId</partner_id>
                 <api_key>testPrivateKey</api_key>
-                <live>1</live>
+                <live>0</live>
                 <sort_order>-11</sort_order>
-            </testpayment>
+            </bharatx>
         </payment>
     </default>
 </config>

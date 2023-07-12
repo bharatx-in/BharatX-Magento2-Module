@@ -257,14 +257,6 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
             "transaction" => isset($bxOrder->transaction)
         ]);
 
-        $this->logger->info("processorderdata", [
-            "transaction" => $bxOrder->transaction,
-        ]);
-
-        $this->logger->info("processorderdata", [
-            "status" => $bxOrder->transaction->status
-        ]);
-
         if($bxOrder !== null && isset($bxOrder->transaction) && isset($bxOrder->transaction->status)){
             $orderStatus = $bxOrder->transaction->status;
             $orderAmount = $bxOrder->transaction->amount;

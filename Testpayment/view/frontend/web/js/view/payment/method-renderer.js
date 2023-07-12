@@ -10,7 +10,7 @@ define(
         'use strict';
         rendererList.push(
             {
-                type: 'testpayment',
+                type: 'bharatx',
                 component: 'Test_Testpayment/js/view/payment/method-renderer/testpayment'
             }
         );

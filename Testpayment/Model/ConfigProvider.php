@@ -9,8 +9,7 @@ class ConfigProvider implements ConfigProviderInterface
     /**
      * @var string[]
      */
-    protected $methodCode = 'testpayment';
-    // protected $methodCode = ['testpayment'];
+    protected $methodCode = 'bharatx';
 
     /**
      * @var \Test\Testpayment\Model\Config
@@ -39,7 +38,8 @@ class ConfigProvider implements ConfigProviderInterface
             'payment' => [
                 'testpayment' => [
                     'title' => $this->config->getTitle(),
-                    'titleImage' => $this->config->getTitleImage()
+                    'titleImage' => $this->config->getTitleImage(),
+                    'frontendTitle' => $this->config->getFrontendTitle()
                 ],
             ],
         ];

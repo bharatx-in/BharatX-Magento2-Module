@@ -35,11 +35,15 @@ define(
             },
 
             getCode: function () {
-                return 'testpayment';
+                return 'bharatx';
             },
 
             getTitle: function () {
                 return window.checkoutConfig.payment.testpayment.title;
+            },
+
+            getFrontendTitle: function () {
+                return window.checkoutConfig.payment.testpayment.frontendTitle;
             },
 
             getTitleImage: function () {

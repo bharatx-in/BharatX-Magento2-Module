@@ -10,6 +10,7 @@ class Config
 {
     const KEY_ACTIVE            = 'active';
     const KEY_TITLE             = 'title';
+    const KEY_FRONTEND_TITLE    = 'frontendTitle';
     const KEY_TITLE_IMAGE       = 'title_image';
     const KEY_NEW_ORDER_STATUS  = 'order_status';
     const KEY_LIVE              = 'live';
@@ -21,7 +22,7 @@ class Config
     /**
      * @var string
      */
-    protected $methodCode = 'testpayment';
+    public $methodCode = 'bharatx';
 
     /**
      * @var ScopeConfigInterface
@@ -59,6 +60,11 @@ class Config
     public function getTitle()
     {
         return $this->getConfigData(self::KEY_TITLE);
+    }
+
+    public function getFrontendTitle()
+    {
+        return $this->getConfigData(self::KEY_FRONTEND_TITLE);
     }
 
     public function getTitleImage()

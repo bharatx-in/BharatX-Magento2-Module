@@ -99,7 +99,7 @@ class UpdateOrdersToProcessing
             ->from(['sop' => $salesOrderPaymentTable], ['method'])
             ->join(['so' => $salesOrderTable], 'sop.parent_id = so.entity_id', ['status', 'increment_id'])
             ->where('so.status = ?', 'pending')
-            ->where('sop.method = ?', 'testpayment')
+            ->where('sop.method = ?', 'bharatx')
             ->where('so.created_at >= ?', $currentTime->format('Y-m-d H:i:s'));;
 
         $result = $connection->fetchAll($select);

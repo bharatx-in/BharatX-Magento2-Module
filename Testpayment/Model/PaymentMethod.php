@@ -12,11 +12,10 @@ use Magento\Framework\Exception\LocalizedException;
 class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
 {
 
-    const METHOD_CODE = 'testpayment';
+    const METHOD_CODE = 'bharatx';
     const ACTION_PROCESSING = 'processing';
 
     protected $_code = self::METHOD_CODE;
-    // protected $_code = 'testpayment';
 
     /**
      * @var \Test\Testpayment\Model\Config
@@ -78,9 +77,9 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Api\ExtensionAttributesFactory $extensionFactory,
         \Magento\Framework\Api\AttributeValueFactory $customAttributeFactory,
+        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
         array $data = []
     ) {
         $this->config   = $config;
