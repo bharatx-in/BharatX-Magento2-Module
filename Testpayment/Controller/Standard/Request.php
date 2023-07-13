@@ -178,8 +178,11 @@ class Request extends \Test\Testpayment\Controller\CfAbstract
         $amount = (int) (number_format($order->getGrandTotal() * 100, 0, ".", ""));
         $this->logger->info('amount: ' . $amount);
 
+        $customerName = ($address->getFirstname() ?? '') . ' ' . ($address->getMiddlename() ?? '') . ' ' . ($address->getLastname() ?? '');
+        $customerName = preg_replace('/\s+/', ' ', $customerName);
+
         $user = array(
-            'name' => $order->getBillingAddress()->getFirstname() . ' ' . $order->getBillingAddress()->getLastname(),
+            'name' => $customerName,
             'phoneNumber' => $customerNumber,
             'email' => $email
         );
