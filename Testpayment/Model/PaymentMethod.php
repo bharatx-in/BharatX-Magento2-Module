@@ -124,7 +124,8 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
      * @throws LocalizedException
      */
     public function refund(InfoInterface $payment, $amount)
-    {
+    {   
+        // $this->logger->logger->info("refund called");
         if (!$this->canRefund()) {
             throw new LocalizedException(__('Refunds are not supported by this payment method.'));
         }
@@ -198,11 +199,12 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
                 // ->setShouldCloseParentTransaction(true);
 
                 // }
-                $this->logger->info('$responseData', [
-                    'responseData' => $responseData
-                ]);
+                // $this->logger->info('$responseData', [
+                //     'responseData' => $responseData
+                // ]);
             } else {
-                $this->logger->error("Transaction or URL property not found in the response.");
+                // $this->logger->error("Transaction or URL property not found in the response.");
+                throw new LocalizedException(__('Transaction or URL property not found in the response'));
             }
         }
 

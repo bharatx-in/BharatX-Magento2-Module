@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="default">
-        <job name="testpayment_order_logger" instance="Test\Testpayment\Cron\OrderSync" method="execute">
-            <schedule>* * * * *</schedule> <!-- Set your desired cron schedule here -->
-        </job>
+        <!-- <job name="testpayment_order_logger" instance="Test\Testpayment\Cron\OrderSync" method="execute">
+            <schedule>* * * * *</schedule> 
+        </job> -->
         <job name="testpayment_update_order_to_processing" instance="Test\Testpayment\Cron\UpdateOrdersToProcessing" method="execute">
-            <schedule>*/5 * * * *</schedule> <!-- Set your desired cron schedule here -->
+            <schedule>0 * * * *</schedule> 
         </job>
-        <job name="testpayment_abandoned_cart" instance="Test\Testpayment\Cron\AbandonedCart" method="execute">
-            <schedule>* * * * *</schedule> <!-- Set your desired cron schedule here -->
-        </job>
+        <!-- <job name="testpayment_abandoned_cart" instance="Test\Testpayment\Cron\AbandonedCart" method="execute">
+            <schedule>* * * * *</schedule> 
+        </job> -->
     </group>
 </config>

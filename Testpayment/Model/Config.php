@@ -45,15 +45,22 @@ class Config
     protected $helper;
 
     /**
+     * @var \Psr\Log\LoggerInterface 
+     */
+    public $logger;
+
+    /**
      * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         WriterInterface $configWriter,
+        \Psr\Log\LoggerInterface $logger,
         \Test\Testpayment\Helper\Testpayment $helper
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->configWriter = $configWriter;
+        $this->logger = $logger;
         $this->helper = $helper;
     }
 
