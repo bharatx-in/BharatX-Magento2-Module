@@ -92,8 +92,8 @@ class UpdateOrdersToProcessing
         $salesOrderPaymentTable = $this->resourceConnection->getTableName('sales_order_payment');
 
         $currentTime = new \DateTime();
-        $interval = new \DateInterval('P1D'); // 1 day interval
-        $currentTime->sub($interval); // Subtract 24 hours
+        $interval = new \DateInterval('PT1H'); // 1 hour interval
+        $currentTime->sub($interval);
 
         $select = $connection->select()
             ->from(['sop' => $salesOrderPaymentTable], ['method'])
@@ -125,10 +125,7 @@ class UpdateOrdersToProcessing
 
                 $validateOrder = $this->baseController->checkRedirectOrderStatus($transactionId, $order);
 
-                if ($validateOrder !== 'PENDING') {
-                    // $order = $this->orderRepository->get($magentoId);
-                    // $order = $this->orderFactory->create()->loadByIncrementId($magentoId);
-                }
+                $this->logger->info("validate order " . $magentoId, $validateOrder);
 
                 if ($validateOrder['status'] == "SUCCESS") {
                     $this->baseController->processPayment($magentoId, $order);
@@ -139,6 +136,27 @@ class UpdateOrdersToProcessing
                 } else if ($validateOrder['status'] == "FAILURE") {
                     $this->logger->info("Bharatx UpdateOrdersToProcessing payment failed for transactionId " . $transactionId);
                     $order->cancel()->save();
+                } else if ($validateOrder['status'] == "PENDING") {
+                    $this->logger->info("Bharatx UpdateOrdersToProcessing payment pending for transactionId " . $transactionId);
+
+                    $creationTime = new \DateTime($order->getCreatedAt());
+                    $currentDateTime = new \DateTime();
+
+                    $interval = $currentDateTime->diff($creationTime);
+                    $minutesDiff = $interval->i;
+                    $hoursDiff = $interval->h;
+                    $daysDiff = $interval->d;
+
+                    $this->logger->info("timedifference", [
+                        "minutes" => $minutesDiff,
+                        "hours" => $hoursDiff,
+                        "days" => $daysDiff
+                    ]);
+
+                    // after 30 mins
+                    if ($daysDiff > 0 || $hoursDiff > 0 || $minutesDiff >= 30) {
+                        $this->baseController->cancelOrder($magentoId);
+                    }
                 } else {
                     $this->logger->info("Bharatx UpdateOrdersToProcessing payment " . $validateOrder['status'] . " for transactionId " . $transactionId);
                 }

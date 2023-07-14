@@ -32,10 +32,10 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
      */
     protected $_canUseCheckout = true;
 
-    /**
-     * @var bool
-     */
-    protected $_canRefund = true;
+    // /**
+    //  * @var bool
+    //  */
+    // protected $_canRefund = true;
 
     /**
      * @var bool
@@ -103,16 +103,6 @@ class PaymentMethod extends \Magento\Payment\Model\Method\AbstractMethod
     public function capture(InfoInterface $payment, $amount)
     {
         return $this;
-    }
-
-    /**
-     * Determine if the payment method allows refund
-     *
-     * @return bool
-     */
-    public function canRefund()
-    {
-        return true;
     }
 
     /**

@@ -53,7 +53,7 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
 
     /**
      * @var \Magento\Customer\Model\Session
-    */
+     */
     protected $customerSession;
 
     /**
@@ -147,16 +147,15 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
         $cfOrderAmount  = $request['additional_data']['cf_transaction_amount'];
         $orderAmount    = round($order->getGrandTotal(), 2);
 
-        if ($orderAmount != $cfOrderAmount)
-        {
+        if ($orderAmount != $cfOrderAmount) {
             $error_message = "Cart order amount = {$orderAmount} doesn't match with amount paid = {$cfOrderAmount}";
             $validation_content['errorMsg'] = $error_message;
             $validation_content['status'] = false;
-            $this->logger->info(__("Test Error: ".$error_message));
+            $this->logger->info(__("Test Error: " . $error_message));
             return $validation_content;
         }
 
-        $getOrderUrl = $this->getOrderUrl()."/".$cfOrderId;
+        $getOrderUrl = $this->getOrderUrl() . "/" . $cfOrderId;
 
         $curl = curl_init();
 
@@ -172,8 +171,8 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
                 "Accept:            application/json",
                 "Content-Type:      application/json",
                 "x-api-version:     2021-05-21",
-                "x-client-id:       ".$this->config->getConfigData('app_id'),
-                "x-client-secret:   ".$this->config->getConfigData('secret_key')
+                "x-client-id:       " . $this->config->getConfigData('app_id'),
+                "x-client-secret:   " . $this->config->getConfigData('secret_key')
             ],
         ]);
 
@@ -183,20 +182,19 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
 
         $cfOrder = json_decode($response);
 
-        if (null !== $cfOrder && !empty($cfOrder->order_status))
-        {
-            if($cfOrderStatus !== $cfOrder->order_status && $cfOrder->order_status !== 'PAID') {
+        if (null !== $cfOrder && !empty($cfOrder->order_status)) {
+            if ($cfOrderStatus !== $cfOrder->order_status && $cfOrder->order_status !== 'PAID') {
                 $error_message = "Signature mismatch.";
                 $validation_content['errorMsg'] = $error_message;
                 $validation_content['status'] = false;
-                $this->logger->info(__("Test Error: ".$error_message));
+                $this->logger->info(__("Test Error: " . $error_message));
                 return $validation_content;
             }
         } else {
             $error_message = "Test Error: Order does not found. Please contact to merchant for support.";
             $validation_content['errorMsg'] = $error_message;
             $validation_content['status'] = false;
-            $this->logger->info(__("Test Error: ".$error_message));
+            $this->logger->info(__("Test Error: " . $error_message));
             return $validation_content;
         }
 
@@ -205,47 +203,6 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
         return $validation_content;
     }
 
-    // protected function validateWebhook($request, $order)
-    // {
-    //     $orderId        = $request["orderId"];
-    //     $cfOrderAmount  = $request["orderAmount"];   
-    //     $paymentMode    = $request["paymentMode"];  
-    //     $referenceId    = $request["referenceId"];   
-    //     $txStatus       = $request["txStatus"]; 
-    //     $txTime         = $request["txTime"]; 
-    //     $txMsg          = $request["txMsg"];
-    //     $signature      = $request["signature"];
-
-    //     $orderAmount    = round($order->getGrandTotal(), 2);
-    //     if ($orderAmount != $cfOrderAmount)
-    //     {
-    //         $error_message = "Cart order amount = {$orderAmount} doesn't match with amount paid = {$cfOrderAmount}";
-    //         $validation_content['errorMsg'] = $error_message;
-    //         $validation_content['status'] = false;
-    //         $this->logger->info(__("Test Error: ".$error_message));
-    //         return $validation_content;
-    //     }
-                    
-    //     $secretKey = $this->config->getConfigData('secret_key');
-
-    //     $data = $orderId.$cfOrderAmount.$referenceId.$txStatus.$paymentMode.$txMsg.$txTime;
-    
-    //     $hash_hmac = hash_hmac('sha256', $data, $secretKey, true) ;
-    //     $computedSignature = base64_encode($hash_hmac); 
-        
-    //     if ($computedSignature != $signature) {
-    //         $error_message = "Signature mismatch.";
-    //         $validation_content['errorMsg'] = $error_message;
-    //         $validation_content['status'] = false;
-    //         $this->logger->info(__("Test Error: ".$error_message));
-    //         return $validation_content;
-    //     }
-
-    //     $validation_content['errorMsg'] = "";
-    //     $validation_content['status'] = true;
-    //     return $validation_content;
-    // }
-
     protected function processOrderData($bxOrder)
     {
         $validation_content = [
@@ -253,11 +210,11 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
         ];
 
         $this->logger->info("processorderdata", [
-            "bxorder"=> $bxOrder,
+            "bxorder" => $bxOrder,
             "transaction" => isset($bxOrder->transaction)
         ]);
 
-        if($bxOrder !== null && isset($bxOrder->transaction) && isset($bxOrder->transaction->status)){
+        if ($bxOrder !== null && isset($bxOrder->transaction) && isset($bxOrder->transaction->status)) {
             $orderStatus = $bxOrder->transaction->status;
             $orderAmount = $bxOrder->transaction->amount;
             $orderTransactionId = $bxOrder->transaction->id;
@@ -273,7 +230,8 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
         return $validation_content;
     }
 
-    protected function validateWebhook($request){
+    protected function validateWebhook($request)
+    {
 
         //TODO: verify the signature coming from the webhook
 
@@ -292,14 +250,51 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
         return $this->processOrderData($content);
     }
 
+    public function cancelOrder($magentoId)
+    {
+        $this->logger->info("Cancel Order called for " . $magentoId);
+        $getPaymentUrl = $this->config->getBharatxApi() . "/merchant/transaction/" . $magentoId . "/cancel";
+
+        $username = $this->config->getConfigData('partner_id');
+        $password = $this->config->getConfigData('api_key');
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, [
+            CURLOPT_URL             => $getPaymentUrl,
+            CURLOPT_RETURNTRANSFER  => true,
+            CURLOPT_ENCODING        => "",
+            CURLOPT_MAXREDIRS       => 10,
+            CURLOPT_TIMEOUT         => 30,
+            CURLOPT_HTTP_VERSION    => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST   => "GET",
+            CURLOPT_HTTPHEADER      => [
+                "Accept:            application/json",
+                "Content-Type:      application/json",
+            ],
+            CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+            CURLOPT_USERPWD => $username . ':' . $password,
+        ]);
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        if ($err) {
+            $this->logger->info("Error in Cancelling Order for id : " . $magentoId . " " . $err);
+            // throw new \Magento\Framework\Exception\LocalizedException(__('checkRedirectOrderStatus curl failed'));
+            return;
+        }
+
+        curl_close($curl);
+
+        $response = json_decode($response);
+
+        return $response;
+    }
+
     public function checkRedirectOrderStatus($cfOrderId, $order)
     {
-        // $getPaymentUrl = $this->getOrderUrl()."/".$cfOrderId."/payments";
-        $getPaymentUrl = $this->getOrderUrl()."/merchant/transaction/".$cfOrderId;
-
-        // $orderAmount    = round($order->getGrandTotal(), 2);
-
-        // $orderAmount = (int) (number_format($order->getGrandTotal() * 100, 0, ".", ""));
+        $getPaymentUrl = $this->getOrderUrl() . "/merchant/transaction/" . $cfOrderId;
 
         $username = $this->config->getConfigData('partner_id');
         $password = $this->config->getConfigData('api_key');
@@ -335,41 +330,10 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
         $bxOrder = json_decode($response);
 
         return $this->processOrderData($bxOrder);
-
-        // if (null !== $cfOrder && !empty($cfOrder[0]->payment_status))
-        // {
-        //     $cfOrderStatus          = $cfOrder[0]->payment_status;
-        //     $cfOrderAmount          = $cfOrder[0]->order_amount;
-        //     $transaction_message    = $cfOrder[0]->payment_message;
-        //     if($cfOrderStatus === 'SUCCESS') {
-        //         if($orderAmount === $cfOrderAmount) {
-        //             $validation_content['txMsg'] = $transaction_message;
-        //             $validation_content['status'] = $cfOrderStatus;
-        //             $validation_content['transaction_id'] = $cfOrder[0]->cf_payment_id;
-        //             $this->logger->info(__("Test Success: ".$transaction_message));
-        //         } else {
-        //             $transaction_message = "Cart order amount = {$orderAmount} doesn't match with amount paid = {$cfOrderAmount}";
-        //             $validation_content['txMsg'] = $transaction_message;
-        //             $validation_content['status'] = 'FAILED';
-        //             $this->logger->info(__("Test Error: ".$transaction_message));
-        //         }
-        //         return $validation_content;
-        //     } else {
-        //         $validation_content['txMsg'] = $transaction_message;
-        //         $validation_content['status'] = $cfOrderStatus;
-        //         $this->logger->info(__("Test Error: ".$transaction_message));
-        //         return $validation_content;
-        //     }
-        // } else {
-        //     $transaction_message = "Test Error: Order does not found. Please contact to merchant for support.";
-        //     $validation_content['errorMsg'] = $transaction_message;
-        //     $validation_content['status'] = "PENDING";
-        //     $this->logger->info(__("Test Error: ".$transaction_message));
-        //     return $validation_content;
-        // }
     }
 
-    public function processPayment($transactionId, $order) {
+    public function processPayment($transactionId, $order)
+    {
         $orderAmount = round($order->getGrandTotal(), 2);
         $order->setState(self::STATE_PROCESSING)->setStatus(self::STATE_PROCESSING);
         $payment = $order->getPayment();
@@ -402,15 +366,14 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
         $quote = $this->objectManagement->get('Magento\Quote\Model\Quote')->load($order->getQuoteId());
         $quote->setIsActive(false)->save();
 
-        if($order->canInvoice() && $this->config->canSendInvoice())
-        {
+        if ($order->canInvoice() && $this->config->canSendInvoice()) {
             $invoice = $this->invoiceService->prepareInvoice($order);
             $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE);
             $invoice->setTransactionId($transactionId);
             $invoice->register();
             $invoice->save();
             $transactionSave = $this->transaction->addObject($invoice)
-                                                    ->addObject($invoice->getOrder());
+                ->addObject($invoice->getOrder());
             $transactionSave->save();
 
             $this->invoiceSender->send($invoice);
@@ -419,34 +382,30 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
             $order->addStatusHistoryComment(
                 __('Notified customer about invoice #%1.', $invoice->getId())
             )
-            ->setIsCustomerNotified(true)
-            ->save();
+                ->setIsCustomerNotified(true)
+                ->save();
 
 
             $this->logger->info("invoice generated for transacation id " . $transactionId);
         }
 
-        try
-        {
+        try {
             $this->checkoutSession->setTestMailSentOnSuccess(true);
             $this->orderSender->send($order, true);
             $this->checkoutSession->unsTestMailSentOnSuccess();
             $this->logger->info("Try sending mail.");
-        }
-        catch (\Magento\Framework\Exception\MailException $exception)
-        {
+        } catch (\Magento\Framework\Exception\MailException $exception) {
             $this->logger->info("catch mail exception.");
             $this->logger->critical($exception);
-        }
-        catch (\Exception $e)
-        {
+        } catch (\Exception $e) {
             $this->logger->info("catch exception.");
             $this->logger->critical($e);
         }
     }
 
-    protected function processWebhookStatus($orderStatus, $order) {
-        
+    protected function processWebhookStatus($orderStatus, $order)
+    {
+
         $order->setState($orderStatus)->setStatus($orderStatus);
         $order->save();
 
@@ -461,13 +420,8 @@ abstract class CfAbstract extends \Magento\Framework\App\Action\Action
      * Return url according to environment
      * @return string
      */
-    protected function getOrderUrl() {
-        // $env = $this->config->getConfigData('environment');
-        // if ($env === 'production') {
-        //     return $this->config->getConfigData('prod_url');
-        // }
-        // return $this->config->getConfigData('test_url');
-
+    protected function getOrderUrl()
+    {
         $order_url = $this->config->getBharatxApi();
         return $order_url;
     }

@@ -183,12 +183,6 @@ class AbandonedCart extends Action
                 $quoteIdMask = $this->quoteIdMaskFactory->create()->load($quoteId, 'quote_id');
                 $maskedId = $quoteIdMask->getMaskedId();
 
-                // $customerId = $quote->getCustomerId();
-
-                // Retrieve customer address
-                // $billingAddressId = $quote->getBillingAddress()->getCustomerAddressId();
-                // $billingAddress = $this->addressRepository->getById($billingAddressId);
-
                 $billingAddress = $quote->getBillingAddress();
                 $shippingAddress = $quote->getShippingAddress();
 

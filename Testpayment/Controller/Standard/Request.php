@@ -121,7 +121,6 @@ class Request extends \Test\Testpayment\Controller\CfAbstract
      */
     public function execute()
     {
-
         $order = $this->checkoutSession->getLastRealOrder();
         $orderId = $order->getIncrementId();
         $new_order_status = $this->config->getNewOrderStatus();
@@ -190,14 +189,18 @@ class Request extends \Test\Testpayment\Controller\CfAbstract
         $username = $this->config->getConfigData('partner_id');
         $password = $this->config->getConfigData('api_key');
 
-        // $transactionId = $orderId . '_' . uniqid();
-        // $transactionId = $orderId . '_' . $username;
         $transactionId = $orderId;
 
         $return_url = $this->config->getReturnUrl($transactionId);
         $notify_url = $this->config->getNotifyUrl();
 
         $transaction_mode = $this->config->getTransactionMode();
+
+        $currentTime = new \DateTime();
+        $interval = new \DateInterval('PT30M'); // 30 minutes interval
+        $currentTime->add($interval);
+
+        $expiryTimestamp = $currentTime->getTimestamp();
 
         $params = array(
             'transaction' => array(
@@ -213,6 +216,7 @@ class Request extends \Test\Testpayment\Controller\CfAbstract
                 'failureRedirectUrl' => $return_url,
                 'cancelRedirectUrl' => $return_url,
                 'webhookUrl' => $notify_url,
+                'expiryTimestamp' => $expiryTimestamp
                 // "testModeConfigurations" => array(
                 //     "shouldFail" => true
                 // )
