@@ -166,57 +166,5 @@ class UpdateOrdersToProcessing
                 $this->logger->error('UpdateOrdersToProcessing Error logging order data: ' . $e->getMessage());
             }
         }
-
-        // Build search criteria to filter orders by payment method and status
-        // $searchCriteria = $this->searchCriteriaBuilder
-        //     ->addFilter('status', 'pending')
-        //     ->create();
-
-        // $paymentMethodFilter = $this->filterBuilder
-        //     ->setField('method')
-        //     ->setConditionType('eq')
-        //     ->setValue('testpayment')
-        //     ->create();
-
-        // $statusFilter = $this->filterBuilder
-        //     ->setField('status')
-        //     ->setConditionType('eq')
-        //     ->setValue('pending')
-        //     ->create();
-
-        // $searchCriteria = $this->searchCriteriaBuilder
-        //     ->addFilters([$paymentMethodFilter, $statusFilter])
-        //     ->create();
-
-        // $baseController = 'testpayment';
-
-        // $searchCriteria = $this->searchCriteriaBuilder
-        //     ->addFilter('payment.method', $baseController)
-        //     ->create();
-
-
-        // Retrieve orders using the search criteria
-        // $orderSearchResult = $this->orderRepository->getList($searchCriteria);
-
-        // $orders = $orderSearchResult->getItems();
-
-
-
-        // foreach ($orders as $order) {
-        // $this->logger->info('Data', $order->getData);
-        // $this->logger->info('Order ID: ' . $order->getIncrementId());
-        // $this->logger->info('Order ID: ',  $order->getData());
-        // Log other order attributes as needed
-        // }
-
-        // foreach ($orders as $order) {
-        //     // Perform actions to update the order to processing status
-        //     // For example, you can update the order status and state
-        //     $order->setStatus('processing');
-        //     $order->setState(\Magento\Sales\Model\Order::STATE_PROCESSING);
-
-        //     // Save the updated order
-        //     $this->orderRepository->save($order);
-        // }
     }
 }

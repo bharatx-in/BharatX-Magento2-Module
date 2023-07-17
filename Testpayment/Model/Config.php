@@ -103,15 +103,12 @@ class Config
 
     public function getNotifyUrl()
     {
-        // return $this->helper->getUrl('testpayment/standard/notify', array('_secure' => true));
-        $baseUrl = 'https://d79a940bf544.ngrok.app';
-        return $baseUrl . '/testpayment/standard/notify';
+        return $this->helper->getUrl('testpayment/standard/notify', array('_secure' => true));
     }
 
     public function getBharatxApi()
     {
         return 'https://web-v2.bharatx.tech/api';
-        // return 'https://90dc5967a878.ngrok.app/api';
     }
 
     public function getConfigData($field, $storeId = null)
