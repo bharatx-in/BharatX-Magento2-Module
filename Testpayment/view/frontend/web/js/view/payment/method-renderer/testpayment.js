@@ -113,7 +113,15 @@ define(
                 var self = this;
                 let requestURL = url.build('testpayment/standard/request');
 
-                console.log(url);
+                this.isPaymentProcessing = $.Deferred();
+
+                $.when(this.isPaymentProcessing).fail(
+                    function (result) {
+                        self.isPlaceOrderActionAllowed(true);
+                        console.log(result);
+                        self.handleError(result);
+                    }
+                );
 
                 $.ajax({
                     type: 'POST',
@@ -138,8 +146,9 @@ define(
                      * @param {*} response
                      */
                     error: function (response) {
-                        console.log(response);
-                        self.isPaymentProcessing.reject(response.message);
+                        const message = response.responseJSON.message;
+                        console.log(response.responseJSON);
+                        self.isPaymentProcessing.reject(message);
                     }
                 });
             },
