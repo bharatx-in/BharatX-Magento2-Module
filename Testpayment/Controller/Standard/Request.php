@@ -27,12 +27,6 @@ class Request extends \Test\Testpayment\Controller\CfAbstract
 
     protected $context;
 
-    // /**
-    //  * @var \Cashfree\Cfcheckout\Helper\Cfcheckout
-    //  */
-
-    // protected $helper;
-
     /**
      * @var \Magento\Framework\DB\Transaction
      */
