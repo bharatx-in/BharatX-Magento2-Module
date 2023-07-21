@@ -171,35 +171,35 @@ class Response extends \Test\Testpayment\Controller\CfAbstract
 
                 $this->logger->info("Bharatx Response payment cancelled for transactionId " . $transactionId);
 
-                $this->messageManager->addErrorMessage('Your payment was cancel');
+                // $this->messageManager->addErrorMessage('Your payment was cancel');
                 $order->cancel()->save();
                 $this->checkoutSession->restoreQuote();
-                $resultRedirect->setPath('checkout/onepage/failure');
+                $resultRedirect->setUrl('/checkout/#payment');
                 return $resultRedirect;
             } else if ($validateOrder['status'] == "FAILURE") {
 
                 $this->logger->info("Bharatx Response payment failed for transactionId " . $transactionId);
 
-                $this->messageManager->addErrorMessage('Your payment was failed');
+                // $this->messageManager->addErrorMessage('Your payment was failed');
                 $order->cancel()->save();
                 $this->checkoutSession->restoreQuote();
-                $resultRedirect->setPath('checkout/onepage/failure');
+                $resultRedirect->setUrl('/checkout/#payment');
                 return $resultRedirect;
             } else if ($validateOrder['status'] == "PENDING") {
 
                 $this->logger->info("Bharatx Response payment pending for transactionId " . $transactionId);
 
                 $this->checkoutSession->restoreQuote();
-                $this->messageManager->addWarningMessage('Your payment is pending');
-                $resultRedirect->setPath('checkout/cart');
+                // $this->messageManager->addWarningMessage('Your payment is pending');
+                $resultRedirect->setUrl('/checkout/#payment');
                 return $resultRedirect;
             } else {
 
                 $this->logger->info("Bharatx Response payment error for transactionId" . $transactionId, $validateOrder);
 
                 $this->checkoutSession->restoreQuote();
-                $this->messageManager->addErrorMessage('There is an error. Payment status is pending');
-                $resultRedirect->setPath('checkout/cart');
+                // $this->messageManager->addErrorMessage('There is an error. Payment status is pending');
+                $resultRedirect->setUrl('/checkout/#payment');
                 return $resultRedirect;
             }
         } else {
