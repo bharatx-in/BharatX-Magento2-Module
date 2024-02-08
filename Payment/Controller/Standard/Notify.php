@@ -145,7 +145,7 @@ class Notify extends \BharatX\Payment\Controller\CfAbstract implements CsrfAware
 
         if (isset($validateOrder['transaction_id'])) {
             $transactionId = $validateOrder['transaction_id'];
-            $magentoId = $transactionId;
+            $magentoId = explode("_", $transactionId)[0];
             $order = $this->objectManagement->create('Magento\Sales\Model\Order')->loadByIncrementId($magentoId);
 
             $mageOrderStatus = $order->getStatus();
@@ -156,7 +156,7 @@ class Notify extends \BharatX\Payment\Controller\CfAbstract implements CsrfAware
                 if ($validateOrder['status'] == "SUCCESS") {
 
                     // maybe need to test if $validateOrder['transaction_id'] has the magento_id
-                    $this->processPayment($magentoId, $order);
+                    $this->processPayment($transactionId, $order);
 
                     $this->logger->info("BharatX Notify order success for BharatX transaction_id(:$transactionId)");
                 } else if ($validateOrder['status'] == "FAILURE" || $validateOrder['status'] == "CANCELLED") {

@@ -135,7 +135,7 @@ class Response extends \BharatX\Payment\Controller\CfAbstract
         if (empty($request['cf_id']) === false) {
 
             $transactionId = $request['cf_id'];
-            $magentoId = $transactionId;
+            $magentoId  = explode("_", $transactionId)[0];;
             $resultRedirect = $this->resultRedirectFactory->create();
             $order = $this->orderFactory->create()->loadByIncrementId($magentoId);
 
@@ -159,7 +159,7 @@ class Response extends \BharatX\Payment\Controller\CfAbstract
 
                 // maybe need to test if $validateOrder['transaction_id'] has the magento_id
                 if ($mageOrderStatus == SELF::STATE_PENDING) {
-                    $this->processPayment($magentoId, $order);
+                    $this->processPayment($transactionId, $order);
                 }
 
                 $this->logger->info("Bharatx Response payment successfull for transactionId " . $transactionId);

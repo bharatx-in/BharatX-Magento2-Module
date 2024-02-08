@@ -124,7 +124,7 @@ class UpdateOrdersToProcessing
             try {
                 $magentoId = $pendingOrder["increment_id"];
 
-                $transactionId = $magentoId;
+                $transactionId = $increment_id + "_bx";
                 $order = $this->orderFactory->create()->loadByIncrementId($magentoId);
 
                 $validateOrder = $this->baseController->checkRedirectOrderStatus($transactionId, $order);
@@ -132,7 +132,7 @@ class UpdateOrdersToProcessing
                 $this->logger->info("validate order " . $magentoId, $validateOrder);
 
                 if ($validateOrder['status'] == "SUCCESS") {
-                    $this->baseController->processPayment($magentoId, $order);
+                    $this->baseController->processPayment($transactionId, $order);
                     $this->logger->info("Bharatx UpdateOrdersToProcessing payment successfull for transactionId " . $transactionId);
                 } else if ($validateOrder['status'] == "CANCELLED") {
                     $this->logger->info("Bharatx UpdateOrdersToProcessing payment cancelled for transactionId " . $transactionId);

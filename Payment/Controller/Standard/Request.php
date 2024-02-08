@@ -183,7 +183,7 @@ class Request extends \BharatX\Payment\Controller\CfAbstract
         $username = $this->config->getConfigData('partner_id');
         $password = $this->config->getConfigData('api_key');
 
-        $transactionId = $orderId;
+        $transactionId = $orderId . "_bx";
 
         $return_url = $this->config->getReturnUrl($transactionId);
         $notify_url = $this->config->getNotifyUrl();
