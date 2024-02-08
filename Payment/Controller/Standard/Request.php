@@ -245,7 +245,6 @@ class Request extends \BharatX\Payment\Controller\CfAbstract
         curl_close($curl);
 
         if ($err) {
-            echo 'cURL Error: ' . $err;
             $responseContent = [
                 'success' => false,
                 'message' => 'Unable to create your order. Please contact support.',
