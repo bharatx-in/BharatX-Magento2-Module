@@ -111,7 +111,7 @@ define(
 
             getOrder: function(orderId) {
                 var self = this;
-                let requestURL = url.build('Bharatx/standard/request');
+                let requestURL = url.build('Bharatxpayment/standard/request');
 
                 this.isPaymentProcessing = $.Deferred();
 
